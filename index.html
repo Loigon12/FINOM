@@ -75,7 +75,7 @@
             </form>
             <p id="error-msg" class="text-rose-500 text-sm text-center mt-4 hidden"><i class="fas fa-exclamation-circle mr-1"></i> Credenciales incorrectas</p>
             <div class="mt-8 text-center border-t border-slate-100 pt-6">
-                <p class="text-xs text-slate-400 font-medium tracking-wide italic">Software de Gestión Financiera y Nómina</p>
+                <p class="text-xs text-slate-400 font-medium tracking-wide italic"> Software de Gestión Financiera y Nómina</p>
             </div>
         </div>
     </div>
@@ -384,14 +384,32 @@
             alert('¡Nómina guardada exitosamente!');
         }
 
-        function actualizarHistorialUI() {
+          function eliminarRegistro(e, id) {
+            e.stopPropagation();
+            if(confirm('¿Seguro que desea eliminar este registro?')) {
+                registros = registros.filter(x => x.id !== id);
+                localStorage.setItem('finom_history', JSON.stringify(registros));
+                actualizarHistorialUI();
+            }
+        }
+
+
+       function actualizarHistorialUI() {
             const container = document.getElementById('sidebar-history');
-            container.innerHTML = registros.length ? '' : '<p class="text-[10px] text-slate-600 italic px-2">No hay registros aún.</p>';
+            container.innerHTML = '';
+            
             registros.slice(0, 5).forEach(r => {
                 const div = document.createElement('div');
-                div.className = 'bg-slate-800/40 p-3 rounded-xl border border-slate-700 hover:border-blue-500 cursor-pointer transition-all fade-in mb-2';
-                div.innerHTML = `<p class="text-[10px] font-bold text-white truncate">${r.nombre}</p><p class="text-[8px] text-slate-500">${r.periodo}</p><p class="text-xs font-bold text-blue-400 mt-1">${format(r.neto)}</p>`;
-                div.onclick = () => cargarDatos(r);
+                div.className = 'bg-slate-800/50 p-3 rounded-xl border border-slate-700 hover:border-blue-500 cursor-pointer transition-all row-anim';
+                div.onclick = () => cargarRegistro(r.id);
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-1">
+                        <p class="text-xs font-bold text-slate-200 truncate w-32">${r.nombre}</p>
+                        <button onclick="eliminarRegistro(event, ${r.id})" class="text-[10px] text-rose-500 hover:text-rose-300"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <p class="text-[9px] text-slate-500">${r.periodo}</p>
+                    <p class="text-xs font-bold text-blue-400 mt-1">${format(r.neto)}</p>
+                `;
                 container.appendChild(div);
             });
         }
